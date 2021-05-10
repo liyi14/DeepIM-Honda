@@ -1,0 +1,101 @@
+DET_EXP_DIR: 'curiosity_det'
+REF_EXP_DIR: 'curiosity_dcm'
+TRAIN:
+  FREQUENCY: 20
+  REF:
+    SOLVER: 'Ranger'
+#    LR_SCHEDULER: 'COSINE' # "WARMUP_MULTISTEP", "COSINE"
+    LEARNING_RATE: 0.0001
+    MOMENTUM: 0.9
+    WEIGHT_DECAY: 0.0001
+    NUM_EPOCH: 30
+    IMGS_EACH_EPOCH: 5000
+    MILESTONES_EPOCH: !!python/tuple [18]
+
+    HEATUP_IMG: 12000
+    HEATUP_STRATEGY: 'SMOOTH'
+    ITERNUM: 4
+    IMS_PER_BATCH: 16
+
+    SNAPSHOT_ITERS_IMG: 20000
+    SNAPSHOT_INFIX: 'curiosity'
+    SNAPSHOT_PREFIX: 'flownet'
+
+    INIT_POSE_TYPE: 'close'
+    ALL_SYN: True
+    SYN_RATIO: 1.
+
+  CURTAIL_RATIO: 1
+
+#  VISUALIZE: True
+  VISUALIZE: False
+
+VAL:
+  CLASSES: []
+  INIT_POSE_TYPE: 'cdpn' # 'close', 'random', 'fixed', 'posecnn', or 'det'
+  FREQUENCY_EPOCH: 2
+
+DATA:
+  ADD_NOISE: True
+  CHROMATIC: True #True
+  CHROM_NOISE: [0.2, 0.2, 0.05]
+  MOTION_BLUR_RATIO: 0.2
+  DEPTH_NOISE_STD: 0.002
+  ADD_HOLES: 0.25
+  DATASET: 'curiosity'
+  NUM_WORKERS: 0
+  REPLACE_REAL_BG_RATIO: 0.9
+  MIN_VIS_RATIO: 0.5
+  LARGE_SCALE:
+    ENABLE: True
+    NUM_MODELS_EACH_ROUND: 20
+    MODEL_SAMPLE_STRATEGY: 'random'
+
+SYN:
+  ONLINE: True
+  WIDTH: 640
+  HEIGHT: 480
+  POSE_UNIFORM_RATIO: 1.0
+  MAX_FG_OBJECT: 1
+  MIN_FG_OBJECT: 1
+  NUM_OTHER_OBJECT: 1
+  BACKGROUND: 'ikea'
+  OCCLUDER_FACTOR: [0.2, 0.4]
+  MAX_REND_TRY: 1
+
+  TNEAR: 1.0
+  TFAR: 1.5
+  MARGIN: 150
+
+LOSS:
+  REF:
+    LW_PML: 1.0
+    PML_NORMALIZE_METHOD: 'constant'
+    LW_FLOW: 0.0
+    LW_ANGLE: 0.0
+    LW_MASK: 0.0
+NETWORK:
+  REF:
+    NAME: "dcm_ot_v0"
+    BASENET_TYPE: "flownets"
+    FC_SIZE: 256
+    IDENTITY_INIT: True
+    # inputs
+    INPUT_MASK: False
+    INPUT_OBS_DEPTH: True
+    INPUT_REND_DEPTH: True
+    DEPTH_TYPE: 'z'
+    # outputs
+    CLASS_AWARE: False
+    TRANS_SCALE_FACTOR: 1.
+TEST:
+  SINGLE_FRAME: True
+  REF:
+    IMS_PER_BATCH: 1
+    ITERNUM: 4
+    INIT_POSE_TYPE: 'close'
+    INIT_STD_ROTATION: 15
+    INIT_SYN_STD_TRANSLATION: [0.01, 0.01, 0.05]
+  SCALES_BASE: !!python/tuple [1.0]
+  VISUALIZE: False
+#  VISUALIZE: True

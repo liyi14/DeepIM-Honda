@@ -1,0 +1,10 @@
+*.mat
+*.mex*
+*.pyc
+*.tgz
+*.so
+*.o
+*.xml
+*.zip
+data/
+output/
