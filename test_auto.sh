@@ -5,7 +5,7 @@ set -e
 
 export PYTHONUNBUFFERED="True"
 export PYTHONPATH=$PYTHONPATH:$PWD
-python ./tools/test_net_dcm.py \
+python ./tools/demo_test.py \
   --gpu -1 \
   --trainset train@curiosity \
   --testset train@curiosity \

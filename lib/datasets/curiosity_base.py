@@ -735,7 +735,37 @@ class Curiosity_Base(data.Dataset, imdb):
             data = {k: v.cuda() for k, v in data.items()}
             target = {k: v.cuda() for k, v in target.items()}
 
+        if False:
+            self.save_synthetic(data, target, index)
         return data, target
+
+    def save_synthetic(self, data, target, index):
+        image = (data['image'].cpu().numpy()*255).astype(np.uint8)
+        depth = (data['depth'].cpu().numpy()*1000).astype(np.uint16)
+        image_path = os.path.join('data/curiosity/data/{:06d}-color.jpg'.format(index))
+        depth_path = os.path.join('data/curiosity/data/{:06d}-depth.png'.format(index))
+        meta_path = os.path.join('data/curiosity/data/{:06d}-meta.json'.format(index))
+        cv2.imwrite(image_path, image)
+        cv2.imwrite(depth_path, depth)
+
+        from transforms3d.euler import euler2quat, quat2euler
+        pose_gt = target['poses'][0].cpu().numpy()
+        pose_src = np.zeros_like(pose_gt)
+
+        euler = quat2euler(pose_gt[:4])
+        euler += cfg.TEST.REF.INIT_STD_ROTATION * np.random.randn(3) * pi / 180.0
+        pose_src[:4] = euler2quat(euler[0], euler[1], euler[2])
+        std_trans = cfg.TEST.REF.INIT_SYN_STD_TRANSLATION
+        pose_src[4] = pose_gt[4] + std_trans[0] * np.random.randn()
+        pose_src[5] = pose_gt[5] + std_trans[1] * np.random.randn()
+        pose_src[6] = pose_gt[6] + std_trans[2] * np.random.randn()
+        meta = {'K': list(data['K'].cpu().numpy().flatten().astype(np.float)),
+                'class_name': self._class_names_all[target['class_id']],
+                'init_pose': list(pose_src.flatten().astype(np.float)),
+                'gt_pose': list(pose_gt.flatten().astype(np.float))}
+
+        with open(meta_path, 'w') as f:
+            json.dump(meta, f)
 
     def get_anchors(self, type='both'):
         if type == 'quat':

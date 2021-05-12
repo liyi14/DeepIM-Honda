@@ -1,5 +1,6 @@
 DET_EXP_DIR: 'curiosity_det'
 REF_EXP_DIR: 'curiosity_dcm'
+NO_LOG: True
 TRAIN:
   FREQUENCY: 20
   REF:

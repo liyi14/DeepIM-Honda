@@ -325,8 +325,6 @@ class DCMOT(nn.Module):
         rgb_rend = kwargs['zoom_image_rend'].detach()
         depth_obs = kwargs['zoom_depth_obs'].detach()
         depth_rend = kwargs['zoom_depth_rend'].detach()
-        pcloud_obs = kwargs['zoom_pcloud_obs'].detach()
-        pcloud_rend = kwargs['zoom_pcloud_rend'].detach()
         if self.network_cfg.INPUT_OBS_DEPTH_MASK:
             depth_mask_obs = (depth_obs > 0.05).float().detach()
         if self.network_cfg.INPUT_REND_DEPTH_MASK:
@@ -338,18 +336,14 @@ class DCMOT(nn.Module):
 
         inputs = [rgb_obs, rgb_rend]
         if self.network_cfg.INPUT_OBS_DEPTH:
-            if self.network_cfg.DEPTH_TYPE == 'pcloud':
-                inputs.append(pcloud_obs)
-            elif self.network_cfg.DEPTH_TYPE == 'z':
+            if self.network_cfg.DEPTH_TYPE == 'z':
                 inputs.append(depth_obs)
             else:
                 raise KeyError
             if self.network_cfg.INPUT_OBS_DEPTH_MASK:
                 inputs.append(depth_mask_obs)
         if self.network_cfg.INPUT_REND_DEPTH:
-            if self.network_cfg.DEPTH_TYPE == 'pcloud':
-                inputs.append(pcloud_rend)
-            elif self.network_cfg.DEPTH_TYPE == 'z':
+            if self.network_cfg.DEPTH_TYPE == 'z':
                 inputs.append(depth_rend)
             else:
                 raise KeyError

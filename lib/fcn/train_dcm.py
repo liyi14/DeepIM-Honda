@@ -1248,13 +1248,6 @@ class DeepCodeMatchingTraining(object):
                 return self.track_refine()
             else:
                 return self.test_refine()
-        elif self._phase == 'DET':
-            if self.is_pointnet_based():
-                self.test_det_pointnet()
-            elif self.cfg.TEST.DET.QUICK_TEST:
-                return self.test_det_quick()
-            else:
-                return self.test_det()
         else:
             raise KeyError
 
