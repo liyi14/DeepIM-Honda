@@ -1,6 +1,3 @@
-[submodule "ycb_render"]
-	path = ycb_render
-	url = https://github.com/yuxng/ycb_render.git
 [submodule "externel/vision"]
 	path = externel/vision
 	url = https://github.com/warmspringwinds/vision.git
