@@ -4,3 +4,6 @@
 [submodule "externel/vision"]
 	path = externel/vision
 	url = https://github.com/warmspringwinds/vision.git
+[submodule "ycb_render/pybind11"]
+	path = ycb_render/pybind11
+	url = https://github.com/pybind/pybind11.git

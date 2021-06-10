@@ -62,7 +62,6 @@ dependencies:
   - zstd=1.4.5=h9ceee32_0
   - pip:
     - appdirs==1.4.4
-    - cppycbrenderer==0.0.1
     - cupy-cuda101==8.3.0
     - cycler==0.10.0
     - cython==0.29.21
