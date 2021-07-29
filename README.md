@@ -43,6 +43,7 @@ sudo apt-get install libassimp-dev
 pip install -r requirement.txt
 python setup.py develop 
 ```
+
 ### Tested environment
 - Ubuntu 16.04
 - PyTorch 1.7.1
