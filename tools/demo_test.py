@@ -215,6 +215,7 @@ class SimpleTester(object):
         instance_class_idx = data['class_idx']
         instance_data_cuda['class_idx'] = instance_class_idx
         instance_data_cuda['pose_rend'] = data['init_pose']
+        instance_data_cuda['pose_init'] = data['init_pose']
         data_ref.append(instance_data_cuda)
         return data_ref
 
@@ -417,9 +418,12 @@ class SimpleTester(object):
 
             if cfg.TEST.VISUALIZE:
                 for i in range(len(data_ref)):
-                    vis = self.visualize(data_ref[i])
-                    vis_fname = '{}-{}.jpg'.format(prefix, i)
-                    cv2.imwrite(os.path.join(self.vis_dir, vis_fname), vis)
+                    vis_fname = '{}-{}_init.jpg'.format(prefix, i)
+                    vis = self.visualize(data_ref[i], 'init')
+                    cv2.imwrite(os.path.join(self.vis_dir, vis_fname), (vis* 255).astype('uint8'))
+                    vis = self.visualize(data_ref[i], 'rend')
+                    vis_fname = '{}-{}_refine.jpg'.format(prefix, i)
+                    cv2.imwrite(os.path.join(self.vis_dir, vis_fname), (vis* 255).astype('uint8'))
 
             if 'gt_pose' in data:
                 pose_init = quatPose2matPose(data['init_pose'])
@@ -502,7 +506,7 @@ class SimpleTester(object):
         plt.show()
 
 
-    def visualize(self, data):
+    def visualize(self, data, type='rend'):
         """
             data: dict of one instance
                     image: tensor HxWx3, cuda, float32
@@ -523,7 +527,12 @@ class SimpleTester(object):
                     pose: tensor 1x7, cuda, float32
                     pose_target: tensor 1x7, cuda, float32
         """
-        pose_rend = data['pose_rend'].cpu().numpy()[0]
+        if type == 'rend':
+            pose_rend = data['pose_rend'].cpu().numpy()[0]
+        elif type == 'init':
+            pose_rend = data['pose_init'].cpu().numpy()[0]
+        else:
+            raise KeyError
 
         def quick_rend(pose):
             K = data['K'].cpu().numpy()
@@ -616,6 +625,8 @@ if __name__ == '__main__':
         image_path = os.path.join('data/curiosity/data/{:06d}-color.jpg'.format(index))
         depth_path = os.path.join('data/curiosity/data/{:06d}-depth.png'.format(index))
         meta_path = os.path.join('data/curiosity/data/{:06d}-meta.json'.format(index))
+        if not os.path.exists(image_path):
+            break
         image = cv2.imread(image_path)/255
         depth = cv2.imread(depth_path, cv2.IMREAD_ANYDEPTH)/1000
         with open(meta_path) as f:

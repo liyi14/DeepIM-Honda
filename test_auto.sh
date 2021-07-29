@@ -12,4 +12,5 @@ python ./tools/demo_test.py \
   --class_ref none \
   --class_test none \
   --cfg experiments/cfgs/curiosity_fnot_rgbd_large_scale_v10_baseline.yml \
-  --phase REF
+  --phase REF \
+  --vis

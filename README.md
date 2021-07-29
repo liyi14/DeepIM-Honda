@@ -48,3 +48,10 @@ python setup.py develop
 - PyTorch 1.7.1
 - CUDA 10.1
 
+### Demo
+Download the model [here](https://drive.google.com/file/d/1KxbUIb68uxyeRvUTdJxN8a6rVnUzwqWp/view?usp=sharing) and extract it to `DeepIM-Honda/output`
+
+The following code will estimate results in `DeepIM-Honda/data/curiosity` and store visualization results in `vis`
+```
+sh test_auto.sh 
+```
