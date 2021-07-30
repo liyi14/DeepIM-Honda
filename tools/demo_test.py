@@ -26,6 +26,7 @@ import sys
 import os
 import os.path as osp
 import cv2
+import time
 
 from lib.fcn.config import cfg, cfg_from_file
 from lib.fcn.train_dcm import DeepCodeMatchingTraining
@@ -406,17 +407,21 @@ class SimpleTester(object):
         data_ref = self.prepare_data_for_refine(data_cuda)
         num_instance = 1
         preds = None
+        t_start = time.time()
         for i_refine in range(num_iter_refine):
             self.update_data_refine(data_ref, preds)
             # self.visualize_input(data_ref[0])
             inputs = self.merge_data(data_ref)
             preds = self._dcm_refine(**inputs)
             self.post_process_refine_preds(data_ref, preds)
+        t_use = time.time()-t_start
 
         if cfg.TEST.VISUALIZE or 'gt_pose' in data:
             self.update_data_refine(data_ref, preds)
 
             if cfg.TEST.VISUALIZE:
+                if not os.path.exists(self.vis_dir):
+                    os.mkdir(self.vis_dir)
                 for i in range(len(data_ref)):
                     vis_fname = '{}-{}_init.jpg'.format(prefix, i)
                     vis = self.visualize(data_ref[i], 'init')
@@ -424,6 +429,7 @@ class SimpleTester(object):
                     vis = self.visualize(data_ref[i], 'rend')
                     vis_fname = '{}-{}_refine.jpg'.format(prefix, i)
                     cv2.imwrite(os.path.join(self.vis_dir, vis_fname), (vis* 255).astype('uint8'))
+
 
             if 'gt_pose' in data:
                 pose_init = quatPose2matPose(data['init_pose'])
@@ -433,7 +439,9 @@ class SimpleTester(object):
                 te_init = te(pose_init[:, 3], pose_gt[:, 3])
                 re_ours = re(pose_ours[:3, :3], pose_gt[:3, :3])
                 te_ours = te(pose_ours[:, 3], pose_gt[:, 3])
-                print("re {:.3f}->{:.3f} te {:.3f}->{:.3f}".format(re_init, re_ours, te_init, te_ours))
+                print("re {:.3f}->{:.3f} te {:.3f}->{:.3f}, {:.3f} seconds".format(re_init, re_ours, te_init, te_ours, t_use))
+            else:
+                print('{:.3f} seconds'.format(t_use))
 
         pose_est_mat = preds['poses_pred'][0].cpu().numpy()
         return pose_est_mat
@@ -621,11 +629,14 @@ if __name__ == '__main__':
 
     train = SimpleTester(cfg, args, class_names, renderer, networks)
     train.load_points(model_mesh_paths, model_scale=1.)
-    for index in range(200):
-        image_path = os.path.join('data/curiosity/data/{:06d}-color.jpg'.format(index))
-        depth_path = os.path.join('data/curiosity/data/{:06d}-depth.png'.format(index))
-        meta_path = os.path.join('data/curiosity/data/{:06d}-meta.json'.format(index))
-        if not os.path.exists(image_path):
+    for index in [0,6,10,20,70,75]:
+        # image_path = os.path.join('data/curiosity/data/{:06d}-color.jpg'.format(index))
+        # depth_path = os.path.join('data/curiosity/data/{:06d}-depth.png'.format(index))
+        # meta_path = os.path.join('data/curiosity/data/{:06d}-meta.json'.format(index))
+        image_path = '/home/yili/PoseEst/honda/DeepIM-Honda/data/real_camera_A/rgb_{:03d}.png'.format(index)
+        depth_path = '/home/yili/PoseEst/honda/DeepIM-Honda/data/real_camera_A/depth_{:03d}.png'.format(index)
+        meta_path = '/home/yili/PoseEst/honda/DeepIM-Honda/data/real_camera_A/meta_{:03d}.json'.format(index)
+        if not os.path.exists(meta_path):
             break
         image = cv2.imread(image_path)/255
         depth = cv2.imread(depth_path, cv2.IMREAD_ANYDEPTH)/1000

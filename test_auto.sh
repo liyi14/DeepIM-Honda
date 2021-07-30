@@ -11,6 +11,6 @@ python ./tools/demo_test.py \
   --testset train@curiosity \
   --class_ref none \
   --class_test none \
-  --cfg experiments/cfgs/curiosity_fnot_rgbd_large_scale_v10_baseline.yml \
+  --cfg experiments/cfgs/curiosity_fnot_rgb_large_scale_v10_baseline.yml \
   --phase REF \
   --vis

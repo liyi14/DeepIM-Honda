@@ -52,7 +52,7 @@ python setup.py develop
 ### Demo
 Download the model [here](https://drive.google.com/file/d/1KxbUIb68uxyeRvUTdJxN8a6rVnUzwqWp/view?usp=sharing) and extract it to `DeepIM-Honda/output`
 
-The following code will estimate results in `DeepIM-Honda/data/curiosity` and store visualization results in `vis`
+The following code will estimate results in `DeepIM-Honda/data/real_camera_A` and store visualization results in `vis`
 ```
 sh test_auto.sh 
 ```

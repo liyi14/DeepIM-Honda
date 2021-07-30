@@ -1,6 +1,5 @@
 DET_EXP_DIR: 'curiosity_det'
 REF_EXP_DIR: 'curiosity_dcm'
-NO_LOG: True
 TRAIN:
   FREQUENCY: 20
   REF:
@@ -83,8 +82,8 @@ NETWORK:
     IDENTITY_INIT: True
     # inputs
     INPUT_MASK: False
-    INPUT_OBS_DEPTH: True
-    INPUT_REND_DEPTH: True
+    INPUT_OBS_DEPTH: False
+    INPUT_REND_DEPTH: False
     DEPTH_TYPE: 'z'
     # outputs
     CLASS_AWARE: False
@@ -93,7 +92,7 @@ TEST:
   SINGLE_FRAME: True
   REF:
     IMS_PER_BATCH: 1
-    ITERNUM: 4
+    ITERNUM: 6
     INIT_POSE_TYPE: 'close'
     INIT_STD_ROTATION: 15
     INIT_SYN_STD_TRANSLATION: [0.01, 0.01, 0.05]

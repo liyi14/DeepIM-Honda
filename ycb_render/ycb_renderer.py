@@ -714,85 +714,43 @@ class YCBRenderer:
         centers = centers[:, ::-1]  # in y, x order
         return centers
 
-
 if __name__ == '__main__':
     # model_path = '/home/yili/PoseEst/posecnn-pytorch/data/Gearbox'
     curr_path = os.path.abspath(os.path.dirname(__file__))
     # model_path = '/home/yili/Downloads/arm/models'
-    width = 800
-    height = 600
+    width = 640
+    height = 480
 
-
-    # model_path = os.path.join(curr_path, '../deepim-pytorch/data/YCB_Video_Dataset/models')
-    # models = ['002_master_chef_can']*3
-    # colors = [[0.9, 0, 0], [0, 0.6, 0], [0, 0, 0.3]]
-    # obj_paths = ['{}/{}/textured_simple.obj'.format(model_path, item) for item in models]
-    # texture_paths = ['{}/{}/texture_map.png'.format(model_path, item) for item in models]
-    # 1806 2050 1797 2077 1829 2065 1835
-
-    renderer = YCBRenderer(width=width, height=height, render_marker=False, model_scale=0.001)
-    model_path = os.path.join(curr_path, '../data/BOP/ycbv/models')
-    models = ['obj_000001']*3
-    colors = [[1,1,1]]*3
-    obj_paths = ['{}/{}.ply'.format(model_path, item) for item in models]
-    texture_paths = ['{}/{}.png'.format(model_path, item) for item in models]
+    renderer = YCBRenderer(width=width, height=height, render_marker=False, model_scale=1)
+    model_path = os.path.join(curr_path, '../data/curiosity/models/block_25/')
+    obj_path = os.path.join(model_path, 'model.obj')
+    texture_path = os.path.join(model_path, 'texture_map.jpg')
+    obj_paths = [obj_path]
+    texture_paths = [texture_path]
+    colors = [[1,1,1]]
     renderer.load_objects(obj_paths, texture_paths, colors)
 
-    # renderer = YCBRenderer(width=width, height=height, render_marker=False, model_scale=1)
-    # model_path = os.path.join('/home/yili/Storage/curiosity/ply_dir_from_blender')
-    # models = ['eval_0']*3
-    # colors = [[1,1,1]]*3
-    # obj_paths = ['{}/{}.ply'.format(model_path, item) for item in models]
-    # texture_paths = ['{}/{}_color.png'.format(model_path, item) for item in models]
-    # renderer.load_objects(obj_paths, texture_paths, colors)
-    # renderer.clean()
-    # model_path = os.path.join(curr_path, '/home/yili/data2/enozone/')
-    # models = ['Product_frozen_burger01', 'Product_frozen_burger02', 'Product_frozen_burger03']
-    # colors = [[0.9, 0, 0], [0, 0.6, 0], [0, 0, 0.3]]
-    # obj_paths = ['{}/Mod/{}.FBX'.format(model_path, item) for item in models]
-    # texture_paths = ['{}/Textures/frozen_products_02.png'.format(model_path, item) for item in models]
-    # renderer.load_objects(obj_paths, texture_paths, colors)
-
     # mat = pose2mat(pose)
-    pose1 = np.array([0.160, 0, 1.000,
-                      0.9992879, -0.0021458883, 0.0304758, 0.022142926])
-    pose2 = np.array([-0.160, 0, 1.000,
-                      0.6582951, 0.03479896, -0.036391996, -0.75107396])
-    pose3 = np.array([0, 0.160, 1.000,
-                      -0.40458265, -0.036644224, -0.6464779, 0.64578354])
-    # pose1[4:] = 0
-    # pose2[4:] = 0
-    # pose3[4:] = 0
-    # pose1[4] = 1
-    # pose2[5] = 1
-    # pose3[6] = 1
-
-    ax = [[0., 0., -1.]]*3
-    angle = [120]*3
-    pose1[3:] = axangle2quat(ax[0], angle[0] / 180.0 * np.pi)
-    pose2[3:] = axangle2quat(ax[1], angle[1] / 180.0 * np.pi)
-    pose3[3:] = axangle2quat(ax[2], angle[2] / 180.0 * np.pi)
+    pose = np.array([-0.15687797963619232, -0.08592509478330612, 1.3832404613494873,
+                      -0.1715252697467804, 0.02293257974088192, 0.9472038149833679, 0.26992249488830566])
+    ax = [[0., 0., -1.]]
+    angle = [120]
+    # pose[3:] = axangle2quat(ax[0], angle[0] / 180.0 * np.pi)
 
     renderer.set_camera_default()
-    renderer.set_poses([pose1, pose2, pose3])
+    renderer.set_poses([pose])
     renderer.set_light_pos([0, 0, 0])
     renderer.set_light_color([1., 1., 1.])
-    renderer.set_projection_matrix(width, height, 600, 600, 400, 300, 0.1, 5000)
+    renderer.set_projection_matrix(width, height, 1066, 1066, 320, 240, 0.1, 5000)
     image_tensor = torch.cuda.FloatTensor(height, width, 4).detach()
     seg_tensor = torch.cuda.FloatTensor(height, width, 4).detach()
-    cls_indexes = [0, 1, 2]
-
-
-    def print_axangle(quat):
-        quat2 = -quat if quat[0] < 0 else quat
-        axangle = quat2axangle(quat2)
-        return "[{:.2f} {:.2f} {:.2f} | {:.2f}]".format(axangle[0][0], axangle[0][1], axangle[0][2],
-                                                        axangle[1] / np.pi * 180.) \
-               + "[{:.2f} {:.2f} {:.2f} {:.2f}]".format(quat2[0], quat2[1], quat2[2], quat2[3])
+    cls_indexes = [0]
 
     def print_quat(quat):
         return "[{:.2f} {:.2f} {:.2f} {:.2f}]".format(quat[0], quat[1], quat[2], quat[3])
 
+    image_path = '/home/yili/PoseEst/honda/DeepIM-Honda/data/pad_camera_A/rgb_006.png'
+    image = cv2.imread(image_path)[:,:,[2,1,0]]
     import time
     start = time.time()
     while True:
@@ -802,7 +760,8 @@ if __name__ == '__main__':
         image_tensor = image_tensor.flip(0)
         seg_tensor = seg_tensor.flip(0)
 
-        frame = [image_tensor.cpu().numpy(), seg_tensor.cpu().numpy()]
+        frame = [image_tensor.cpu().numpy()[:,:,:3], (image/255).astype('float32')]
+        frame.append(frame[0]*0.4+frame[1]*0.6)
         centers = renderer.get_centers()
         for center in centers:
             x = int(center[1] * width)
@@ -819,31 +778,47 @@ if __name__ == '__main__':
                 np.concatenate(frame, axis=1), cv2.COLOR_RGB2BGR))
             q = cv2.waitKey(16)
             if q == ord('p'):
-                Image.fromarray(
-                    (frame[0][:, :, :3] * 255).astype(np.uint8)).save('test.png')
-            elif q == ord('q'):
+                print(list(pose[3:])+list(pose[:3]))
+            elif q == ord('t'):
                 break
-            elif q == ord('r'):  # rotate
+            elif q == ord('y'):  # rotate
                 a = qmult(axangle2quat(
-                    [1, 0, 0], 5/180.0 * np.pi), pose1[3:])
-                pose1[3:] = a
+                    [1, 0, 0], 5/180.0 * np.pi), pose[3:])
+                pose[3:] = a
+            elif q == ord('h'):  # rotate
                 b = qmult(axangle2quat(
-                    [0, 1., 0], 5 / 180.0 * np.pi), pose2[3:])
-                pose2[3:] = b
+                    [0, 1., 0], 5 / 180.0 * np.pi), pose[3:])
+                pose[3:] = b
+            elif q == ord('m'):  # rotate
                 c = qmult(axangle2quat(
-                    [0, 0, 1.], 5 / 180.0 * np.pi), pose3[3:])
-                pose3[3:] = c
-                # pose1[3:] = [0.84, 0.0, 0.0, -0.54]
-                # pose2[3:] = [0.68, -0.18, 0.18, -0.68]
-                # pose2[3:] = pose3[3:]
-                print('quat 1:', print_quat(pose1[3:]))
-                print('quat 2:', print_quat(pose2[3:]))
-                print('quat 3:', print_quat(pose3[3:]))
-                print('axangle 1:', print_axangle(pose1[3:]))
-                print('axangle 2:', print_axangle(pose2[3:]))
-                print('axangle 3:', print_axangle(pose3[3:]))
-                print(renderer.get_poses())
-                renderer.set_poses([pose1, pose2, pose3])
+                    [0, 0, 1.], 5 / 180.0 * np.pi), pose[3:])
+                pose[3:] = c
+            elif q == ord('u'):  # rotate
+                a = qmult(axangle2quat(
+                    [-1, 0, 0], 5/180.0 * np.pi), pose[3:])
+                pose[3:] = a
+            elif q == ord('j'):  # rotate
+                b = qmult(axangle2quat(
+                    [0, -1., 0], 5 / 180.0 * np.pi), pose[3:])
+                pose[3:] = b
+            elif q == ord('n'):  # rotate
+                c = qmult(axangle2quat(
+                    [0, 0, -1.], 5 / 180.0 * np.pi), pose[3:])
+                pose[3:] = c
+            elif q == ord('w'):
+                pose[1] -= 0.01
+            elif q == ord('s'):
+                pose[1] += 0.01
+            elif q == ord('a'):
+                pose[0] -= 0.01
+            elif q == ord('d'):
+                pose[0] += 0.01
+            elif q == ord('q'):
+                pose[2] -= 0.01
+            elif q == ord('e'):
+                pose[2] += 0.01
+
+            renderer.set_poses([pose])
 
         # cam_pos = [np.sin(theta), z, np.cos(theta)]
         # renderer.set_camera(cam_pos, [0, 0, 0], [0, 1, 0])
